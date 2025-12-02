@@ -24,7 +24,7 @@ export default function App() {
             paddingBottom: 10,
             paddingTop: 10,
           },
-          tabBarActiveTintColor: '#F97316',
+          tabBarActiveTintColor: '#fff',
           tabBarInactiveTintColor: '#9CA3AF',
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;

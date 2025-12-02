@@ -28,6 +28,7 @@ export default function HomeScreen() {
     return () => clearTimeout(timer);
   }, []);
 
+  
   const handleSetGoals = () => {
     setShowPopup(false);
 

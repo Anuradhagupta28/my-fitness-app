@@ -28,7 +28,7 @@ export default function HomeScreen() {
     return () => clearTimeout(timer);
   }, []);
 
-  
+
   const handleSetGoals = () => {
     setShowPopup(false);
 
@@ -40,7 +40,7 @@ export default function HomeScreen() {
   };
 
   const filters = ["All", "Move", "Train", "Recover"];
-  const completedWorkouts = [
+  const completedWorkouts = [   
     { name: "Tennis Wall Pr...", duration: "45 min" },
     { name: "Back & Biceps", duration: "1h 30m" },
   ];

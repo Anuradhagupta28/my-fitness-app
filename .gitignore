@@ -2,6 +2,8 @@
 
 # dependencies
 node_modules/
+Demo.jsx
+Demo2.jsx
 
 # Expo
 .expo/

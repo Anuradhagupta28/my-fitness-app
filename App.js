@@ -7,10 +7,22 @@ import TrainScreen from './screens/TrainScreen';
 import TeamScreen from './screens/TeamScreen';
 import FeedScreen from './screens/FeedScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import { useFonts } from "expo-font";
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+   const [fontsLoaded] = useFonts({
+  
+      AeonikMedium: require("./assets/fonts/Aeonik-Medium.otf"),
+     AeonikLight: require("./assets/fonts/Aeonik-Light.otf"),
+      AeonikBold: require("./assets/fonts/Aeonik-Bold.otf"),
+        AeonikMediumItalic: require("./assets/fonts/Aeonik-MediumItalic.otf"),
+     AeonikLightItalic: require("./assets/fonts/Aeonik-LightItalic.otf"),
+      AeonikBoldItalic: require("./assets/fonts/Aeonik-BoldItalic.otf"),
+  });
+
+  if (!fontsLoaded) return null;
   return (
     <NavigationContainer>
       <Tab.Navigator

@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import AText from "../Components/AText";
+import GradientButton from "../Components/GradientButton";
+import SleepGoalScreen from "./SleepGoalScreen";
 import {
   View,
   Text,
@@ -13,54 +15,78 @@ import {
   Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import PopUp from "../screens/PopUpScreen";
+import GradientText from "../Components/GradientText";
 
 const { width } = Dimensions.get("window");
-// const CARD_WIDTH = (width - 16 * 2) / 2;
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const [activeFilter, setActiveFilter] = useState("All");
   const [showPopup, setShowPopup] = useState(true);
+  const [showSleepGoal, setShowSleepGoal] = useState(false);
+const [actionScrollProgress, setActionScrollProgress] = useState(0);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      tabBarStyle: showSleepGoal
+        ? { display: "none" }
+        : {
+            backgroundColor: "#121212",
+            borderColor: "#374151",
+            borderWidth: 1,
+            height: 80,
+            paddingBottom: 10,
+            paddingTop: 10,
+            borderRadius: 24,
+          },
+    });
+  }, [showSleepGoal, navigation]);
 
   const handleSetGoals = () => {
     setShowPopup(false);
-    console.log("Set Goals pressed");
+    setShowSleepGoal(true);
   };
 
   const handleClosePopup = () => {
     setShowPopup(false);
   };
+const handleActionScroll = ({ nativeEvent }) => {
+  const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
+  const maxScroll = contentSize.width - layoutMeasurement.width;
 
+  if (maxScroll <= 0) {
+    setActionScrollProgress(1);
+    return;
+  }
+
+  const progress = contentOffset.x / maxScroll;
+  setActionScrollProgress(progress);
+};
   const filters = ["All", "Move", "Train", "Recover"];
-  const completedWorkouts = [
-    { name: "Tennis Wall Pr...", duration: "45 min" },
-    { name: "Back & Biceps", duration: "1h 30m" },
-  ];
 
   const suggestions = [
     {
       name: "Weak Hand Finishing Drill",
       category: "Move",
       duration: "25 min",
-      emoji: "https://media.istockphoto.com/id/2027278927/photo/young-athletic-woman-exercising-with-barbell-during-sports-training-in-a-gym.jpg?s=612x612&w=0&k=20&c=ifFL7Mqc8NwTj25PAx4ONy1OOQZvc1S_kVOofsbLgFw=",
-      color: "#F97316",
+      emoji:require("../assets/image1.png"),
+       
+      gradientColors: ["#FF6B35", "#F97316"],
     },
     {
       name: "10 minute Post-workout Stretching",
       category: "Recover",
       duration: "10 min",
-      emoji: "https://img.freepik.com/premium-photo/man-break-stretching-gym-floor-fitness-workout-training-strong-muscles-heart-health-cardio-wellness-japanese-personal-trainer-sports-person-coach-body-warmup-exercise_590464-282205.jpg?w=360",
-      color: "#A855F7",
+            emoji:require("../assets/image2.png"),
+ gradientColors: ["#C084FC", "#A855F7"],
     },
     {
       name: "Jump Rope HIIT",
       category: "Train",
       duration: "20 min",
-      emoji: "https://media.istockphoto.com/id/1449353914/photo/fitness-gym-and-black-man-doing-a-workout-with-weights-for-strength-wellness-and-training.jpg?s=612x612&w=0&k=20&c=ozKkP-4W7Fg7c77s3-gE7QsxX51BJVEKi6LOxIMk8M0=",
-      color: "#FBBF24",
+            emoji:require("../assets/image4.png"),
+  gradientColors: ["#FCD34D", "#FBBF24"],
     },
   ];
 
@@ -68,14 +94,21 @@ export default function HomeScreen() {
     {
       id: "1",
       title: "Start a Custom\nWorkout",
-      image: "https://images.pexels.com/photos/414029/pexels-photo-414029.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      image:require("../assets/image3.png"),
       buttonText: "Start Now ››",
       buttonType: "gradient",
     },
     {
       id: "2",
       title: "Take the\nBSA Test",
-      image: "https://images.pexels.com/photos/1431283/pexels-photo-1431283.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      image:require("../assets/image4.png"),
+      buttonText: "Test Now",
+      buttonType: "pill",
+    },
+    {
+      id: "3",
+      title: "Do the\nYoga",
+      image:require("../assets/image1.png"),
       buttonText: "Test Now",
       buttonType: "pill",
     },
@@ -84,24 +117,29 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-    
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <View>
-            <AText weight="medium" style={styles.welcomeText}>Welcome Jordan</AText>
-            
-            <AText weight="LightItalic" style={styles.dateText}>Tuesday, September 9</AText>
-   
-
-     
-
+            <AText weight="medium" style={styles.welcomeText}>
+              Welcome Jordan
+            </AText>
+            <AText weight="LightItalic" style={styles.dateText}>
+              Tuesday, September 9
+            </AText>
           </View>
           <View style={styles.headerIcons}>
             <TouchableOpacity style={styles.iconButton}>
               <Ionicons name="calendar-outline" size={22} color="#FFF" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="chatbubble-outline" size={22} color="#FFF" />
+              <Ionicons
+                name="chatbubble-ellipses-outline"
+                size={22}
+                color="#FFF"
+              />
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>2</Text>
               </View>
@@ -118,38 +156,61 @@ export default function HomeScreen() {
             />
             <View style={styles.statsContainer}>
               <View style={styles.statRow}>
-                <AText weight="medium" style={styles.statText}>Move</AText>
-                <AText weight="medium" style={[styles.statPercentage, { color: "#EC4899" }]}>68%</AText>
+                <AText weight="medium" style={styles.statText}>
+                  Move
+                </AText>
+                <GradientText
+                  colors={["#FFA33A", "#DB0F42"]}
+                  style={styles.statPercentage}
+                >
+                  68%
+                </GradientText>
               </View>
               <View style={styles.statRow}>
-                <AText weight="medium" style={styles.statText}>Train</AText>
-                <AText weight="medium" style={[styles.statPercentage, { color: "#FBBF24" }]}>65%</AText>
+                <AText weight="medium" style={styles.statText}>
+                  Train
+                </AText>
+                <GradientText
+                  colors={["#FFFFAF", "#D29507"]}
+                  style={styles.statPercentage}
+                >
+                  65%
+                </GradientText>
               </View>
               <View style={styles.statRow}>
-                <AText weight="medium" style={styles.statText}>Recover</AText>
-                <AText weight="medium" style={[styles.statPercentage, { color: "#A855F7" }]}>32%</AText>
+                <AText weight="medium" style={styles.statText}>
+                  Recover
+                </AText>
+                <GradientText
+                  colors={["#FA9EFF", "#860ABB"]}
+                  style={styles.statPercentage}
+                >
+                  32%
+                </GradientText>
               </View>
-              
+
               <View style={styles.buttonRow}>
                 <TouchableOpacity style={styles.viewMoreButton}>
-                  <AText weight="medium" style={styles.viewMoreText}>View More</AText>
+                  <AText weight="medium" style={styles.viewMoreText}>
+                    View More
+                  </AText>
                   <Ionicons name="chevron-forward" size={14} color="#FFF" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.viewMoreButton}>
-                  <AText weight="medium" style={styles.viewMoreText}>•••</AText>
+                  <AText weight="medium" style={styles.viewMoreText}>
+                    •••
+                  </AText>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </View>
 
-       
-
-
         <View style={styles.section}>
-          <AText weight="medium" style={styles.sectionTitle}>Suggested for you</AText>
+          <AText weight="medium" style={styles.sectionTitle}>
+            Suggested for you
+          </AText>
 
-   
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -157,27 +218,18 @@ export default function HomeScreen() {
             contentContainerStyle={{ paddingRight: 20 }}
           >
             {filters.map((filter) => (
-              <TouchableOpacity
+              <GradientButton
                 key={filter}
+                active={activeFilter === filter}
                 onPress={() => setActiveFilter(filter)}
-                style={[
-                  styles.filterPill,
-                  activeFilter === filter && styles.filterPillActive,
-                ]}
+                style={{ marginRight: 8 }}
               >
-                <Text
-                  style={[
-                    styles.filterText,
-                    activeFilter === filter && styles.filterTextActive,
-                  ]}
-                >
-                  {filter}
-                </Text>
-              </TouchableOpacity>
+                {filter}
+              </GradientButton>
             ))}
           </ScrollView>
 
-              <ScrollView
+          <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 20, paddingRight: 40 }}
@@ -186,20 +238,34 @@ export default function HomeScreen() {
             {suggestions.map((item, idx) => (
               <View key={idx} style={styles.suggestionCard}>
                 <ImageBackground
-                  source={{ uri: item.emoji }}
+                 source={item.emoji} 
                   style={styles.suggestionImageBg}
                   imageStyle={{ borderRadius: 20 }}
                 >
-                  <View style={styles.suggestionOverlay} />
+                
+                  <LinearGradient
+                    colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.9)"]} // <— your 50%-50% gradient
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                    style={styles.cardGradient}
+                  />
+
+                 
+
                   <View style={styles.suggestionContent}>
                     <Text style={styles.suggestionName}>{item.name}</Text>
                     <View style={styles.suggestionFooter}>
-                      <View
-                        style={[styles.categoryBadge, { backgroundColor: item.color }]}
-                      >
-                        <Text style={styles.categoryText}>{item.category}</Text>
+                      <View style={styles.categoryBadge}>
+                        <GradientText
+                          colors={item.gradientColors}
+                          style={styles.categoryText}
+                        >
+                          {item.category}
+                        </GradientText>
                       </View>
-                      <Text style={styles.suggestionDuration}>{item.duration}</Text>
+                      <Text style={styles.suggestionDuration}>
+                        {item.duration}
+                      </Text>
                     </View>
                   </View>
                 </ImageBackground>
@@ -208,32 +274,53 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        <View style={styles.actionCardsSection}>
+       <View style={styles.actionCardsSection}>
+
+  <View style={styles.actionProgressTrack}>
+    <View
+      style={[
+        styles.actionProgressFill,
+        { width: `${Math.max(8, actionScrollProgress * 100)}%` },
+      ]}
+    />
+  </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 20 }}
+               onScroll={handleActionScroll}          // 👈 HERE, on the HORIZONTAL scroller
+    scrollEventThrottle={16}      
           >
             {ACTION_CARDS.map((item) => (
               <View key={item.id} style={styles.card}>
                 <ImageBackground
-                  source={{ uri: item.image }}
+                  source={item.image }
                   style={styles.bg}
                   imageStyle={{ borderRadius: 20 }}
                 >
-                  <View style={styles.overlay} />
+               
+                  <LinearGradient
+                    colors={["rgba(0,0,0,0.9)", "rgba(0,0,0,0.3)"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                    style={styles.actionCardGradient}
+                  />
+
+               
+
                   <View style={styles.content}>
                     <Text style={styles.title}>{item.title}</Text>
                     {item.buttonType === "gradient" && (
-                      <LinearGradient
-                        colors={["#F97316", "#DC2626"]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
+                      <GradientButton
+                        active
+                        onPress={() => console.log("Pressed:", item.title)}
                         style={styles.gradientBtn}
+                        textStyle={styles.gradientBtnText}
                       >
-                        <Text style={styles.gradientBtnText}>{item.buttonText}</Text>
-                      </LinearGradient>
+                        {item.buttonText}
+                      </GradientButton>
                     )}
+
                     {item.buttonType === "pill" && (
                       <TouchableOpacity style={styles.pillBtn}>
                         <View style={styles.iconCircle}>
@@ -257,35 +344,41 @@ export default function HomeScreen() {
       </ScrollView>
 
       <TouchableOpacity style={styles.aiButtonContainer}>
-            <LinearGradient
-  colors={[
-    "rgba(0,0,0,1)",
-
-    "rgba(0,255,255,0.35)",
-    "rgba(150,0,255,0.35)",
-    "rgba(255,80,0,0.35)",
-
-    "rgba(0,0,0,0.9)"
-  ]}    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={styles.aiGradient}
-  >
-    <View style={styles.innerContainer}>
-
-      <TouchableOpacity activeOpacity={0.9} style={styles.aiButtonContent}>
-        <View style={styles.aiIconWrapper}>
-        <Image source={require("../assets/ai-Icon.png")} />
-        </View>
-        <Text style={styles.aiButtonText}>Ask Ballogy AI</Text>
+        <LinearGradient
+          colors={[
+            "rgba(0,0,0,1)",
+            "rgba(0,255,255,0.35)",
+            "rgba(150,0,255,0.35)",
+            "rgba(255,80,0,0.35)",
+            "rgba(0,0,0,0.9)",
+          ]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.aiGradient}
+        >
+          <View style={styles.innerContainer}>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              style={styles.aiButtonContent}
+            >
+              <View style={styles.aiIconWrapper}>
+                <Image source={require("../assets/ai-Icon.png")} />
+              </View>
+              <Text style={styles.aiButtonText}>Ask Ballogy AI</Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
       </TouchableOpacity>
-    </View>
-  </LinearGradient>
-           </TouchableOpacity>
 
       <PopUp
         visible={showPopup}
         onClose={handleClosePopup}
         onSetGoals={handleSetGoals}
+      />
+
+      <SleepGoalScreen
+        visible={showSleepGoal}
+        onClose={() => setShowSleepGoal(false)}
       />
     </View>
   );
@@ -357,19 +450,16 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255, 255, 255, 0.1)",
     borderWidth: 1,
   },
- ringsContainer: {
+  ringsContainer: {
     flexDirection: "row",
     alignItems: "center",
-      marginHorizontal: 10,
+    marginHorizontal: 10,
   },
   ringsIcon: {
-   
-    marginLeft:-20
+    marginLeft: -20,
   },
   statsContainer: {
     flex: 1,
-  
-
   },
   statRow: {
     flexDirection: "row",
@@ -409,20 +499,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginRight: 4,
   },
-  menuButton: {
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.15)",
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  menuButtonText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "600",
-    letterSpacing: 2,
-  },
   section: {
     marginBottom: 28,
   },
@@ -438,31 +514,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 20,
   },
-  filterPill: {
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    marginRight: 8,
-  },
-  filterPillActive: {
-    backgroundColor: "#F97316",
-  },
-  filterText: {
-    color: "#9CA3AF",
-    fontWeight: "600",
-    fontSize: 15,
-  },
-  filterTextActive: {
-    color: "#FFF",
-  },
   suggestionCard: {
     width: 164,
     height: 216,
     borderRadius: 20,
     overflow: "hidden",
-   
-    marginLeft:18
+    marginLeft: 18,
+     borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
   },
   suggestionImageBg: {
     flex: 1,
@@ -472,14 +531,9 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.4)",
   },
-  suggestionImage: {
-    height: 140,
-    backgroundColor: "#374151",
-  },
   suggestionContent: {
     padding: 14,
     zIndex: 1,
-    
   },
   suggestionName: {
     color: "#FFF",
@@ -494,32 +548,32 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   categoryBadge: {
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 5,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   categoryText: {
-    color: "#FFF",
-    fontSize: 11,
     fontWeight: "700",
+    fontSize: 13,
+    letterSpacing: 0.5,
   },
   suggestionDuration: {
     color: "#9CA3AF",
     fontSize: 12,
     fontWeight: "500",
   },
-  actionCardsSection: {
-    marginBottom: 24,
-    //  borderColor:'red',
-    // borderWidth:2
-  },
+ 
   card: {
     width: 176,
     height: 154,
     borderRadius: 20,
     overflow: "hidden",
     marginRight: 12,
-    
+     borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
   },
   bg: {
     flex: 1,
@@ -532,7 +586,7 @@ const styles = StyleSheet.create({
     padding: 18,
     flex: 1,
     justifyContent: "space-between",
-   
+
   },
   title: {
     color: "#fff",
@@ -542,10 +596,11 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   gradientBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    width:130,
+    
     borderRadius: 25,
-    alignSelf: "flex-start",
+
+   
   },
   gradientBtnText: {
     color: "#fff",
@@ -578,26 +633,17 @@ const styles = StyleSheet.create({
   aiButtonContainer: {
     alignItems: "center",
     position: "absolute",
-    bottom: 40,
+    bottom: 30,
     right: 20,
-       
-
-   
-
   },
-
   aiGradient: {
     borderRadius: 999,
     padding: 2,
-    
   },
-
   innerContainer: {
     borderRadius: 999,
-    overflow: "hidden",  
-      
+    overflow: "hidden",
   },
-
   aiButtonContent: {
     flexDirection: "row",
     alignItems: "center",
@@ -605,7 +651,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: "rgba(0,0,0,0.65)",
   },
-
   aiIconWrapper: {
     width: 28,
     height: 28,
@@ -615,13 +660,35 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.1)",
     marginRight: 8,
   },
-
   aiButtonText: {
     color: "#fff",
     fontSize: 14,
     fontWeight: "600",
   },
+  cardGradient: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 20,
+  },
+  actionCardGradient: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 20,
+  },
+  actionCardsSection: {
+  marginBottom: 24,
+},
 
- 
+actionProgressTrack: {
+  height: 3,
+  borderRadius: 999,
+  backgroundColor: "rgba(255,255,255,0.08)",
+  marginHorizontal: 20,
+  marginBottom: 10,
+  overflow: "hidden",
+},
 
+actionProgressFill: {
+  height: "100%",
+  borderRadius: 999,
+  backgroundColor: "#fff", 
+},
 });
